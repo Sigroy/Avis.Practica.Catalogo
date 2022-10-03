@@ -7,10 +7,10 @@ namespace Avis.Catalogo.Application;
 
 // Extensión de la unidad de trabajo
 
-public interface IDapperUnitofWork: IDapperUnitofWork
+public interface IDapperUnitofWork: IUnitofWork
 {
-    IQryRepository<Auto> ResQryRepository { get; }
-    ICmdRepository<Auto> ResCmdRepository { get;  }
+    IQryRepository<Auto> AutoQryRepository { get; }
+    ICmdRepository<Auto> AutoCmdRepository { get;  }
 
     IInMemoryRepository<Auto> InMemoryRepository { get; }
 }
