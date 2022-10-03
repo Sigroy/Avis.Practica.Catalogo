@@ -18,7 +18,7 @@
 
     <ItemGroup>
       <Folder Include="Controllers" />
-      <Folder Include="Layers\Infrastructure" />
+      <Folder Include="Layers\Infrastructure\Startup" />
     </ItemGroup>
 
 </Project>
