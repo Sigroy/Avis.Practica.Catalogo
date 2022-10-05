@@ -37,27 +37,27 @@ public static class ServiceCollectionExtensions
                 Url = new Uri("https://www.apache.org/licenses/LICENSE-2.0.txt"),
             };
             c.SwaggerDoc("v3", info);
-            c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-            {
-                In = ParameterLocation.Header,
-                Description = "Please insert JWT with Bearer into field",
-                Name = "Authorization",
-                Type = SecuritySchemeType.ApiKey
-            });
-            c.AddSecurityRequirement(new OpenApiSecurityRequirement
-            {
-                {
-                    new OpenApiSecurityScheme
-                    {
-                        Reference = new OpenApiReference
-                        {
-                            Type = ReferenceType.SecurityScheme,
-                            Id = "Bearer"
-                        }
-                    },
-                    new string[] { }
-                }
-            });
+            //c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            //{
+            //    In = ParameterLocation.Header,
+            //    Description = "Please insert JWT with Bearer into field",
+            //    Name = "Authorization",
+            //    Type = SecuritySchemeType.ApiKey
+            //});
+            //c.AddSecurityRequirement(new OpenApiSecurityRequirement
+            //{
+            //    {
+            //        new OpenApiSecurityScheme
+            //        {
+            //            Reference = new OpenApiReference
+            //            {
+            //                Type = ReferenceType.SecurityScheme,
+            //                Id = "Bearer"
+            //            }
+            //        },
+            //        new string[] { }
+            //    }
+            //});
 
 
             //El nombre por default es el nombre del ensamblado con la extension XML
@@ -67,8 +67,8 @@ public static class ServiceCollectionExtensions
             c.IncludeXmlComments(xmlPath);
         });
 
-        services.AddAuthentication("BasicAuthentication")
-            .AddScheme<AuthenticationSchemeOptions, SwagBasicAuthenticationHandler>("BasicAuthentication", null);
+        //services.AddAuthentication("BasicAuthentication")
+            //.AddScheme<AuthenticationSchemeOptions, SwagBasicAuthenticationHandler>("BasicAuthentication", null);
 
         services.AddScoped<ISwagUserService, SwagUserService>();
 

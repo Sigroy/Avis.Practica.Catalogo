@@ -26,8 +26,8 @@ var app = builder.Build();
 app.UseStaticFiles();
 app.MapSwagger();
 app.UseHttpsRedirection();
-app.UseAuthentication();
-app.UseAuthorization();
+// app.UseAuthentication();
+// app.UseAuthorization();
 app.AddRoutes();
 
 #region ÁREA DEL PROGRAMA
