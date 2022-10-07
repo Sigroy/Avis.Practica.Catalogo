@@ -1,33 +1,38 @@
 ﻿using AutoMapper;
 using AVIS.CoreBase.Extensions;
+
 using Avis.Catalogo.Application;
 
-namespace Avis.Catalogo.Infrastructure;
-
-public static class WebApplicationExtensions
+namespace Avis.Catalogo.Infrastructure
 {
-    private static void AddAutomapper()
+    public static class WebApplicationExtensions
     {
-        var config = new MapperConfiguration(cfg => { cfg.AddProfile<DomainMapping>(); });
-
-        var mapper = config.CreateMapper();
-        MapperFactory.AddMapper(mapper);
-    }
-
-    public static WebApplication MapSwagger(this WebApplication app)
-    {
-        AddAutomapper();
-
-        app.UseSwagger();
-
-        app.UseSwaggerUI(c =>
+        private static void AddAutomapper()
         {
-            c.SwaggerEndpoint("/swagger/v3/swagger.json", "API PRÁCTICA CATÁLOGO AUTOS V1");
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.AddProfile<DomainMappings>();
+            });
 
-            c.InjectStylesheet("/swaggerext/swagger-ui.css");
-            c.InjectJavascript("/swaggerext/swagger-ui.js", "text/javascript");
-        });
+            var mapper = config.CreateMapper();
+            MapperFactory.AddMapper(mapper);
+        }
 
-        return app;
+        public static WebApplication MapSwagger(this WebApplication app)
+        {
+            AddAutomapper();
+
+            app.UseSwagger();
+
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v3/swagger.json", "API DEMO CITAS V1");
+
+                c.InjectStylesheet("/swaggerext/swagger-ui.css");
+                c.InjectJavascript("/swaggerext/swagger-ui.js", "text/javascript");
+            });
+
+            return app;
+        }
     }
 }

@@ -1,19 +1,21 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System.Runtime.CompilerServices;
 
-namespace Avis.Catalogo.Infrastructure;
-
-public static class RoutesExtensions
+namespace Avis.Catalogo.Infrastructure
 {
-    public static void AddRoutes(this WebApplication app)
+    public static class RoutesExtensions
     {
-        app.UseRouting();
+        public static void AddRoutes(this WebApplication app)
+        {
+            app.UseRouting();
 
-        app.UseEndpoints(
-            endpoints =>
-            {
-                endpoints.MapControllerRoute(
+            app.UseEndpoints(
+                endpoints =>
+                {
+                    endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id:int?}");
-            });
+                    
+                });
+        }
     }
 }

@@ -3,25 +3,25 @@ using AVIS.CoreBase.Interfaces;
 using System.Data;
 using System.Data.SqlClient;
 
-//Dependencia Arquitectura
 using Avis.Catalogo.Domain;
 using Avis.Catalogo.Application;
 
-namespace Avis.Catalogo.Infrastructure;
-
-public class DapperUnitofWork : UnitofWorkBase, IDapperUnitofWork
+namespace Avis.Catalogo.Infrastructure
 {
-    public IQryRepository<Auto> AutoQryRepository { get; private set; }
-    public ICmdRepository<Auto> AutoCmdRepository { get; private set; }
-
-    public IInMemoryRepository<Auto> InMemoryRepository { get; private set; }
-
-    public DapperUnitofWork(SqlConnection sqlConnection, IDbTransaction dbTransaction) : base(dbTransaction)
+    public class DapperUnitofWork : UnitofWorkBase, IDapperUnitofWork
     {
-        AutoQryRepository = RepositoryResolver.GetQryRepositoryInstance<Auto>(sqlConnection, dbTransaction);
-        AutoCmdRepository = RepositoryResolver.GetCmdRepositoryInstance<Auto>(sqlConnection, dbTransaction);
+        public IQryRepository<Auto> AutoQryRepository { get; private set; }
+        public ICmdRepository<Auto> AutoCmdRepository { get; private set; }
+        
+        public IInMemoryRepository<Auto> InMemoryRepository { get; private set; }
 
 
-        InMemoryRepository = RepositoryResolver.GetInMemoryRepositoryInstance<Auto>();
+        public DapperUnitofWork(SqlConnection sqlConnection, IDbTransaction dbTransaction) : base(dbTransaction)
+        {
+            AutoQryRepository = RepositoryResolver.GetQryRepositoryInstance<Auto>(sqlConnection, dbTransaction);
+            AutoCmdRepository = RepositoryResolver.GetCmdRepositoryInstance<Auto>(sqlConnection, dbTransaction);
+
+            InMemoryRepository = RepositoryResolver.GetInMemoryRepositoryInstance<Auto>();
+        }
     }
 }

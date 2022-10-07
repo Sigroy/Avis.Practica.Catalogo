@@ -3,7 +3,7 @@ using Serilog.Events;
 
 namespace Avis.Catalogo.Infrastructure
 {
-    public static  class WebApplicationBuilderExtensions
+    public static class WebApplicationBuilderExtensions
     {
         public static void AddSerilog(this ConfigureHostBuilder host)
         {
@@ -14,13 +14,13 @@ namespace Avis.Catalogo.Infrastructure
             {
                 Directory.CreateDirectory(dir);
             }
-            var name = "Práctica catálogo autos-" + DateTime.Now.Year.ToString() + DateTime.Now.Month.ToString() + DateTime.Now.Day.ToString() + ".txt";
-            //CONFIGURAMOS EL SERVICIO DE LOG
+            var name = "Demo autos-" + DateTime.Now.Year.ToString() + DateTime.Now.Month.ToString() + DateTime.Now.Day.ToString() + ".txt";
+
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                 .Enrich.FromLogContext()
-                .WriteTo.File(dir + name, retainedFileCountLimit : 30)
+                .WriteTo.File(dir + name, retainedFileCountLimit: 30)
                 .CreateLogger();
 
             host.UseSerilog();

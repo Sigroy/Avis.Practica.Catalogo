@@ -1,122 +1,126 @@
 ﻿using AVIS.CoreBase.Clases;
 using AVIS.CoreBase.Extensions;
+
 using FluentValidation.Results;
 using FluentValidation;
+
 using Avis.Catalogo.Application;
 using Avis.Catalogo.Domain;
+using FluentNHibernate.Mapping;
 
-namespace Avis.Catalogo.Infrastructure;
-
-public class AutoAggregate : IAutoAggregate
+namespace Avis.Catalogo.Infrastructure
 {
-    private Auto _auto;
-
-    private readonly IValidator<AutoDTO> _validator;
-
-    private readonly IDapperUnitofWork _unitofWork;
-
-    public IList<InternalException> Errores { get; } = new List<InternalException>();
-
-    public bool Success { get; private set; } = false;
-
-    public AutoAggregate(IValidator<AutoDTO> validator,
-        IDapperUnitofWork unitofWork)
+    public class AutoAggregate : IAutoAggregate
     {
-        _unitofWork = unitofWork;
-        _validator = validator;
-    }
+        private Auto _auto;
 
-    public async Task<int> CreateAsync(AutoDTO auto)
-    {
-        Success = false;
-        int id = 0;
-        try
+        private readonly IValidator<AutoDTO> _validator;
+
+        private readonly IDapperUnitofWork _unitofWork;
+
+        public IList<InternalException> Errores { get; } = new List<InternalException>();
+
+        public bool Success { get; private set; } = false;
+
+        public AutoAggregate(IValidator<AutoDTO> validator, IDapperUnitofWork unitofWork)
         {
-            ValidationResult result = await _validator.ValidateAsync(auto);
-
-            if (!result.IsValid)
-            {
-                Errores.ToList().AddRange(result.ToErrorList(this.GetType().ToString(), "CreateAsync"));
-                Success = false;
-            }
-            else
-            {
-                _auto = auto.ToModelorVM<Auto>();
-                var key = Guid.NewGuid().ToString();
-                _auto.AutoPkey = key;
-
-                #region TRANSACCION DAPPER
-
-                try
-                {
-                    id = await _unitofWork.AutoCmdRepository.AddAsync(_auto);
-
-                    if (_unitofWork.AutoCmdRepository.Success)
-                    {
-                        if (_unitofWork.AutoCmdRepository.Success)
-                        {
-                            Success = true;
-                        }
-                    }
-
-                    if (Success)
-                    {
-                        _unitofWork.Commit();
-                    }
-                    else
-                    {
-                        id = 0;
-                        Success = false;
-
-                        if (_unitofWork.AutoCmdRepository.Errores.Count > 0)
-                        {
-                            _unitofWork.AutoCmdRepository.Errores.ToCurrentList(Errores);
-                        }
-
-                        _unitofWork.Rollback();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Success = false;
-                    string extra = "";
-                    if (ex.InnerException != null)
-                    {
-                        extra = ex.InnerException.Message;
-                    }
-
-                    InternalException error = new InternalException()
-                    {
-                        ClassName = this.GetType().ToString(),
-                        MethodName = "Transaccion Dapper",
-                        ErrorMessage = "Inner:" + extra + " Exception:" + ex.Message,
-                        Ex = ex
-                    };
-                    Errores.Add(error);
-                }
-
-                #endregion
-            }
+            _unitofWork = unitofWork;
+            _validator = validator;
         }
-        catch (Exception ex)
+
+        public async Task<int> CreateAsync(AutoDTO auto)
         {
             Success = false;
-            string extra = "";
-            if (ex.InnerException != null)
+            int id = 0;
+            try
             {
-                extra = ex.InnerException.Message;
+                ValidationResult result = await _validator.ValidateAsync(auto);
+                if (!result.IsValid)
+                {
+                    Errores.ToList().AddRange(result.ToErrorList(this.GetType().ToString(), "Create"));
+                    Success = false;
+                }
+                else
+                {
+                    _auto = auto.ToModelorVM<Auto>();
+                    var key = Guid.NewGuid().ToString();
+                    _auto.AutoPkey = key;
+                    Auto coche = _auto.ToModelorVM<Auto>();
+                    coche.AutoPkey = key;
+                    coche.Marca = "Toyota";
+                    coche.Modelo = "Corola";
+                    coche.Color = "Azul";
+                    coche.Tipo = "Sedan";
+
+                    #region TRANSACCION DAPPER
+                    try
+                    {
+                        id = await _unitofWork.AutoCmdRepository.AddAsync(_auto);
+
+                        if (_unitofWork.AutoCmdRepository.Success)
+                        {
+                            coche.AutoId = id;
+                            int id2 = await _unitofWork.AutoCmdRepository.AddAsync(coche);
+                            if (_unitofWork.AutoCmdRepository.Success)
+                            {
+                                Success = true;
+                            }
+                        }
+
+                        if (Success)
+                        {
+                            _unitofWork.Commit();
+                        }
+                        else
+                        {
+                            id = 0;
+                            Success = false;
+                            if (_unitofWork.AutoCmdRepository.Errores.Count > 0)
+                            {
+                                _unitofWork.AutoCmdRepository.Errores.ToCurrentList(Errores);
+                            }
+                            _unitofWork.Rollback();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Success = false;
+                        string extra = "";
+                        if (ex.InnerException != null)
+                        {
+                            extra = ex.InnerException.Message;
+                        }
+                        InternalException error = new InternalException()
+                        {
+                            ClassName = this.GetType().ToString(),
+                            MethodName = "Transaccion Dapper",
+                            ErrorMessage = "Inner:" + extra + " Exception:" + ex.Message,
+                            Ex = ex
+                        };
+                        Errores.Add(error);
+                    }
+                    #endregion
+                }
+            }
+            catch (Exception ex)
+            {
+                Success = false;
+                string extra = "";
+                if (ex.InnerException != null)
+                {
+                    extra = ex.InnerException.Message;
+                }
+                InternalException error = new InternalException()
+                {
+                    ClassName = this.GetType().ToString(),
+                    MethodName = "Add",
+                    ErrorMessage = "Inner:" + extra + " Exception:" + ex.Message,
+                    Ex = ex
+                };
+                Errores.Add(error);
             }
 
-            InternalException error = new InternalException()
-            {
-                ClassName = this.GetType().ToString(),
-                MethodName = "Add",
-                ErrorMessage = "Inner:" + extra + " Exception:" + ex.Message,
-                Ex = ex
-            };
-            Errores.Add(error);
+            return id;
         }
-
-        return id;
     }
 }
